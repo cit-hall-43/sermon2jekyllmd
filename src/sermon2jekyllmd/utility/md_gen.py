@@ -42,7 +42,7 @@ def gen_html_underline_from_cell(cell):
                     # 替換原始文字
                     run.text = underlined_html
 
-    return cell.text
+    return cell.text.replace('</u><u>', '')
 
 def write_header(file_path):
     # 獲取今天的日期
