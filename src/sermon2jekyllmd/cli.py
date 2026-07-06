@@ -1,6 +1,10 @@
 from pathlib import Path
-from utility import parser, logger, md_gen, common
 import os
+
+try:
+    from .utility import parser, logger, md_gen, common
+except ImportError:  # pragma: no cover - supports running the file directly
+    from utility import parser, logger, md_gen, common
 
 def get_file_paths(file_name):
     """
@@ -77,7 +81,7 @@ def main():
     elif len(table_data[0]) == 11:
         title, weekday_titles, weekday_contents = parser.parse_table_length_11(table_data)
         logger.write_to_log(title)
-    elif len(table_data[0]) == 12:
+    elif len(table_data[0]) == 12 or len(table_data[0]) == 14:
         title, weekday_titles, weekday_contents = parser.parse_table_length_12(table_data)
         logger.write_to_log(title)
     else:
