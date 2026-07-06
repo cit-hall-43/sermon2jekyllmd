@@ -1,47 +1,70 @@
 # sermon2jekyllmd
 
 ## Overview
-This project converts `.docx` sermon guide files into Jekyll-compatible Markdown files for weekly devotionals. It is designed to automate the workflow for generating weekly devotional content from structured Word documents.
+`sermon2jekyllmd` converts `.docx` sermon guide files into Jekyll-compatible Markdown files for weekly devotionals. It reads a structured Word table, extracts titles and weekday content, applies markdown formatting, and writes both the `.md` output and a `.txt` log.
 
-## Features
-- Converts `.docx` tables to Markdown with special formatting for scripture references and underlined text
-- Supports multiple table formats (7, 4, 11, 12 columns)
-- Automatically names output files based on input or current week/year
-- Logs all major steps and errors
+## Requirements
+- Python 3.13+
+- Dependencies in `requirements.txt` or `pyproject.toml`
+  - `python-docx`
+  - `pytest` for tests
 
-## Project Structure
-- `src/sermon2jekyllmd/cli.py`: Main CLI entrypoint; coordinates the conversion process
-- `src/sermon2jekyllmd/utility/`: Utility modules for parsing, Markdown generation, logging, and common helpers
-	- `parser.py`: Table parsing logic for different formats
-	- `md_gen.py`: Markdown formatting and underlined text handling
-	- `logger.py`: Logging utilities
-	- `common.py`: File/date helpers and string utilities
-- `docs/`: Input `.docx` files and output Markdown files
-- `logs/`: Log files for each conversion
+## Installation
+1. Install dependencies:
+   ```sh
+   pip install -r requirements.txt
+   ```
+2. Or use Poetry:
+   ```sh
+   poetry install
+   ```
 
 ## Usage
-1. Place your `.docx` sermon guide in the `docs/` directory.
-2. Run the CLI:
-	 ```sh
-	 python src/sermon2jekyllmd/cli.py
-	 ```
-3. Enter the base name of your `.docx` file (without extension) when prompted. If left blank, the latest `.docx` in `docs/` is used.
-4. The converted Markdown will be saved in `docs/`, and a log file will be created in `logs/`.
+1. Put your source `.docx` file into the `docs/` directory.
+2. Run the converter:
+   ```sh
+   python src/sermon2jekyllmd/cli.py
+   ```
+   Or, if installed with Poetry:
+   ```sh
+   poetry run sermon2jekyllmd
+   ```
+3. When prompted, enter the base filename of the `.docx` file (without `.docx`).
+4. If you press Enter without typing a filename, the script uses the latest `.docx` in `docs/` and generates a Markdown file named with the current year/week.
 
-## Conventions
-- Variable names, comments, and some file names use Chinese for clarity with the target audience
-- Scripture references are blockquoted in Markdown; the first word of each paragraph is bolded
-- Underlined text in `.docx` is converted to `<u>...</u>` in Markdown
-- Only certain table formats are supported; errors are logged and halt execution if format is unrecognized
+## Output
+- Markdown output is written to `docs/` with a `.md` extension.
+- Log output is written to `logs/` with a `.txt` extension.
+- If the filename is empty, the log file uses the latest `.docx` basename, while the Markdown filename is generated from the current ISO week and year.
 
-## Extending
-- Add new table parsing logic in `parser.py` for new formats
-- Update `md_gen.py` for changes in Markdown formatting rules
-- Use helpers in `common.py` for consistent file/date handling
+## Supported Table Formats
+The CLI supports `.docx` tables with these column layouts:
+- 7 columns
+- 4 columns
+- 11 columns
+- 12 columns
+- 14 columns (treated as 12-column format)
+
+## Formatting Conventions
+- Scripture references are written as Markdown blockquotes
+- The first word of each paragraph is bolded
+- Underlined text in `.docx` is converted to HTML-style `<u>...</u>` inside Markdown
+- Output files include a front matter header with date, title, thumbnail, and bookmark metadata
+
+## Project Structure
+- `src/sermon2jekyllmd/cli.py`: Main CLI entrypoint and file-path handling
+- `src/sermon2jekyllmd/utility/parser.py`: Reads `.docx` tables and parses supported table structures
+- `src/sermon2jekyllmd/utility/md_gen.py`: Generates Markdown text and handles underline formatting
+- `src/sermon2jekyllmd/utility/logger.py`: Sets up log output
+- `src/sermon2jekyllmd/utility/common.py`: File/date utilities and text helpers
+- `docs/`: Source `.docx` files and generated Markdown files
+- `logs/`: Conversion logs
+
+## Notes
+- The script raises an error if a supplied file name does not exist in `docs/`.
+- Only supported table formats are accepted; unsupported tables stop execution with a logged error.
 
 ## References
-- See `.github/copilot-instructions.md` for AI agent and contributor guidelines
-- Key files: `src/sermon2jekyllmd/cli.py`, `src/sermon2jekyllmd/utility/`
-
----
-For questions about project-specific conventions or unclear patterns, consult the code in `src/sermon2jekyllmd/` and `.github/copilot-instructions.md`.
+- Main entrypoint: `src/sermon2jekyllmd/cli.py`
+- Utility modules: `src/sermon2jekyllmd/utility/`
+- Package script: `poetry run sermon2jekyllmd`
